@@ -1,0 +1,273 @@
+---
+title: "Chicago"
+author: "Bill Lang"
+date: "1/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r}
+allCoarse <- c("North|South|Southwest|West|Loop|Central")
+
+allFine <- c("North Center|Horner Park|Roscoe Village|Lake View|Boystown|Lake View East|Graceland West|South East Ravenswood|Wrigleyville|Lincoln Park|Old Town Triangle|Park West|Ranch Triangle|Sheffield Neighbors|Wrightwood Neighbors|Avondale|Belmont Gardens|Chicago's Polish Village|Kosciuszko Park|Logan Square|Belmont Gardens|Bucktown|Kosciuszko Park|Palmer Square|Rogers Park|East Rogers Park|West Ridge|Arcadia Terrace|Peterson Park|West Rogers Park|Uptown|Buena Park|Argyle Street|Margate Park|Sheridan Park|Lincoln Square|Ravenswood|Ravenswood Gardens|Rockwell Crossing|Edison Park|Edison Park|Norwood Park|Big Oaks|Old Norwood Park|Oriole Park|Union Ridge|Jefferson Park|Gladstone Park|Forest Glen|Edgebrook|Old Edgebrook|South Edgebrook|Sauganash|Wildwood|North Park|Brynford Park|Hollywood Park|River's Edge|Sauganash Woods|Albany Park|Mayfair|North Mayfair|Ravenswood Manor|O'Hare|Schorsch Forest View|Edgewater|Andersonville|Edgewater Glen|Edgewater Beach|Magnolia Glen|Lakewood/Balmoral|Portage Park|Belmont Central|Władysławowo|Six Corners|Irving Park|Avondale Gardens|Independence Park|Kilbourn Park|Little Cassubia|Old Irving Park|West WalkerThe Villa|Dunning|Belmont Terrace|Irving Woods|Schorsch Village|Montclare|Montclare|Belmont Cragin|Belmont Central|Hanson Park|Hermosa|Belmont Gardens|Kelvyn Park|Near North Side|Cabrini–Green|The Gold Coast|Goose Island|Magnificent Mile|Old Town|River North|River West|Streeterville|Loop|Loop|New Eastside|South Loop|West Loop Gate|Near South Side|Dearborn Park|Printer's Row|South Loop|Prairie Avenue Historic District|Humboldt Park|West Town|East Village|Noble Square|Polish Downtown|Pulaski Park|Smith Park|Ukrainian Village|Wicker Park|Austin|Galewood|The Island|West Garfield Park|East Garfield Park|Fifth City|Near West Side|Fulton River District|Fulton Market|Greektown|Illinois Medical District|Little Italy|Tri-Taylor|North Lawndale|Lawndale|Homan Square|Douglas Park|South Lawndale|Little Village|Lower West Side|Heart of Chicago|Heart of Italy|Pilsen|East Pilsen|Armour Square|Chinatown|Wentworth Gardens|Douglas|Groveland Park|Lake Meadows|The Gap|Prairie Shores|South Commons|Oakland|Fuller Park|Grand Boulevard|Bronzeville|Kenwood|Kenwood|South Kenwood|Washington Park|Hyde Park|East Hyde Park|Hyde Park|Woodlawn|West Woodlawn|South Shore|Jackson Park Highlands|Bridgeport|Greater Grand Crossing|Grand Crossing|Parkway Gardens|Park Manor|Garfield Ridge|LeClaire Courts|Sleepy Hollow|Vittum Park|Archer Heights|Brighton Park|McKinley Park|New City|Back of the Yards|Canaryville|West Elsdon|Gage Park|Clearing|Chrysler Village|West Lawn|Ford City|West Lawn|Chicago Lawn|Lithuanian Plaza|Marquette Park|West Englewood|Englewood|Chatham|East Chatham|West Chatham|West Chesterfield|Avalon Park|Avalon Park|Marynook|Stony Island Park|South Chicago|The Bush|Burnside|Calumet Heights|Pill Hill|Roseland|Fernwood|Rosemoor|Pullman|Cottage Grove Heights|London Towne|South Deering|Jeffrey Manor|Trumbull Park|East Side|West Pullman|Riverdale|Altgeld Gardens|Eden Green|Golden Gate|Hegewisch|Ashburn|Beverly View|Mary Crest|Parkview|Scottsdale|Wrightwood|Auburn Gresham|Beverly|Washington Heights|Brainerd|Longwood Manor|Princeton Park|Mount Greenwood|Mount Greenwood Heights|Talley's Corner|Morgan Park|Beverly Woods|Kennedy Park|West Morgan Park|evanston|des plaines|arlington heights|glenview|deerfield|skokie|city|oak park|glencoe|northbrook|river forest")
+```
+
+
+```{r}
+
+n <- ("North side|north|northside|north side")
+fn <- ("farnorth|suburban north|suburbannorth|suburban-north|suburban north side")
+nw <- ("northwest|northwest|north west|northwestside|suburban-northwest|suburban northwest|north west side|north-west|suburban northwest side|northwest suburban")
+c <- ("central")
+w <- ("west|westside|west side|suburban west|suburban-west")
+s <- ("south side|south")
+sw <- ("southwest|southwest side|southwest|south west|southwestside|south-west")
+fse <- ("farsoutheast|sub - south")
+fsw <- ("farsouthwest|suburban southwest|suburban southwest|suburban south|sub south|suburban southwest side|sub southwest|suburban-southwest|suburban south west")
+
+
+north <- c("North Center|Horner Park|Roscoe Village|Lake View|Boystown|Lake View East|Graceland West|South East Ravenswood|Wrigleyville|Lincoln Park|Old Town Triangle|Park West|Ranch Triangle|Sheffield Neighbors|Wrightwood Neighbors|Avondale|Belmont Gardens|Chicago's Polish Village|Kosciuszko Park|Logan Square|Belmont Gardens|Bucktown|Kosciuszko Park|Palmer Square")
+
+  
+farNorth <- c("Rogers Park|East Rogers Park|West Ridge|Arcadia Terrace|Peterson Park|West Rogers Park|Uptown|Buena Park|Argyle Street|Margate Park|Sheridan Park|Lincoln Square|Ravenswood|Ravenswood Gardens|Rockwell Crossing|Edison Park|Edison Park|Norwood Park|Big Oaks|Old Norwood Park|Oriole Park|Union Ridge|Jefferson Park|Gladstone Park|Forest Glen|Edgebrook|Old Edgebrook|South Edgebrook|Sauganash|Wildwood|North Park|Brynford Park|Hollywood Park|River's Edge|Sauganash Woods|Albany Park|Mayfair|North Mayfair|Ravenswood Manor|O'Hare|Schorsch Forest View|Edgewater|Andersonville|Edgewater Glen|Edgewater Beach|Magnolia Glen|Lakewood|Balmoral|highland park|evanston|arlington heights|des plaines|glenview|skokie|deerfield|glencoe")
+  
+northWest <- c("Portage Park|Belmont Central|Władysławowo|Six Corners|Irving Park|Avondale Gardens|Independence Park|Kilbourn Park|Little Cassubia|Old Irving Park|West WalkerThe Villa|Dunning|Belmont Terrace|Irving Woods|Schorsch Village|Montclare|Montclare|Belmont Cragin|Belmont Central|Hanson Park|Hermosa|Belmont Gardens|Kelvyn Park") 
+
+central <- c("Near North Side|Cabrini–Green|The Gold Coast|Goose Island|Magnificent Mile|Old Town|River North|River West|Streeterville|Loop|Loop|New Eastside|South Loop|West Loop Gate|Near South Side|Dearborn Park|Printer's Row|South Loop|Prairie Avenue Historic District|city")
+  
+westSide <- c("Humboldt Park|West Town|East Village|Noble Square|Polish Downtown|Pulaski Park|Smith Park|Ukrainian Village|Wicker Park|Austin|Galewood|The Island|West Garfield Park|East Garfield Park|Fifth City|Near West Side|Fulton River District|Fulton Market|Greektown|Illinois Medical District|Little Italy|Tri-Taylor|North Lawndale|Lawndale|Homan Square|Douglas Park|South Lawndale|Little Village|Lower West Side|Heart of Chicago|Heart of Italy|Pilsen|East Pilsen|oak park|river forest")
+  
+south <- c("Armour Square|Chinatown|Wentworth Gardens|Douglas|Groveland Park|Lake Meadows|The Gap|Prairie Shores|South Commons|Oakland|Fuller Park|Grand Boulevard|Bronzeville|Kenwood|Kenwood|South Kenwood|Washington Park|Hyde Park|East Hyde Park|Hyde Park|Woodlawn|West Woodlawn|South Shore|Jackson Park Highlands|Bridgeport|Greater Grand Crossing|Grand Crossing|Parkway Gardens|Park Manor")
+  
+southWest <- c("Garfield Ridge|LeClaire Courts|Sleepy Hollow|Vittum Park|Archer Heights|Brighton Park|McKinley Park|New City|Back of the Yards|Canaryville|West Elsdon|Gage Park|Clearing|Chrysler Village|West Lawn|Ford City|West Lawn|Chicago Lawn|Lithuanian Plaza|Marquette Park|West Englewood|Englewood")  
+
+farsouthEast <- c("Chatham|East Chatham|West Chatham|West Chesterfield|Avalon Park|Avalon Park|Marynook|Stony Island Park|South Chicago|The Bush|Burnside|Calumet Heights|Pill Hill|Roseland|Fernwood|Rosemoor|Pullman|Cottage Grove Heights|London Towne|South Deering|Jeffrey Manor|Trumbull Park|East Side|West Pullman|Riverdale|Altgeld Gardens|Eden Green|Golden Gate|Hegewisch")
+
+farsouthWest <- c("Ashburn|Beverly View|Mary Crest|Parkview|Scottsdale|Wrightwood|Auburn Gresham|Beverly|Washington Heights|Brainerd|Longwood Manor|Princeton Park|Mount Greenwood|Mount Greenwood Heights|Talley's Corner|Morgan Park|Beverly Woods|Kennedy Park|West Morgan Park")
+
+#nonCentral <- c("evanston|des plaines|arlington heights|glenview|deerfield|skokie|oak park|glencoe|northbrook")
+nonCentral <- c("removethisvector")
+```
+
+
+
+```{r}
+data <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_chicago.csv")
+
+data1 <- data %>% 
+  dplyr::select(Year, Column, Area, Street) %>% 
+  mutate(Column = tolower(Column)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+  
+dataMuta <- data1 %>% 
+  mutate(Small = ifelse(grepl(allFine, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
+  mutate(Small = ifelse(grepl(allFine, Area, ignore.case = TRUE) & Small == "", as.character(Area), as.character(Small))) %>% 
+  mutate(Large = ifelse(grepl(allCoarse, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
+  mutate(Large = ifelse(grepl(allCoarse, Area, ignore.case = TRUE) & Large == "", as.character(Area), as.character(Large)))
+
+
+
+
+
+dataMutb <- dataMuta %>% 
+  mutate(smallCoded = ifelse(grepl(north, Small, ignore.case = TRUE), "North", 
+              ifelse(grepl(farNorth, Small, ignore.case = TRUE), "FarNorth", 
+              ifelse(grepl(northWest, Small, ignore.case = TRUE), "NorthWest", 
+              ifelse(grepl(central, Small, ignore.case = TRUE), "Central",
+              ifelse(grepl(westSide, Small, ignore.case = TRUE), "WestSide", 
+              ifelse(grepl(south, Small, ignore.case = TRUE), "South",
+              ifelse(grepl(southWest, Small, ignore.case = TRUE), "SouthWest",
+              ifelse(grepl(farsouthEast, Small, ignore.case = TRUE), "FarSouthEast",
+              ifelse(grepl(farsouthWest, Small, ignore.case = TRUE), "FarSouthWest",
+              ifelse(grepl(nonCentral, Small, ignore.case = TRUE), "Suburb", 1)))))))))))
+
+dataMutb
+```
+
+Only find that 20,000~ observations are located by using the fine geography. 
+
+Fine geogrpahy was choosen first as it is less likely to move over time. Once a communiy area or neighborhood is established it remains in the same place and thus can act as a strong relationship overtime.
+
+```{r}
+dataMutb %>% 
+  group_by(smallCoded) %>% 
+  summarise(
+    total = n()
+  ) %>% arrange(desc(total))
+```
+
+Coarse Geography is searched for second. 
+
+```{r}
+
+
+dataMutc <- dataMutb %>% mutate(smallCoded = ifelse(smallCoded == 1, 
+                      ifelse(grepl(fn, Large, ignore.case = TRUE), "FarNorth",
+                      ifelse(grepl(nw, Large, ignore.case = TRUE), "NorthWest",
+                      ifelse(grepl(fsw,Large, ignore.case = TRUE), "FarSouthWest",
+                      ifelse(grepl(sw, Large, ignore.case = TRUE), "SouthWest",
+                      ifelse(grepl(fse,Large, ignore.case = TRUE), "FarSouthEast",
+                      ifelse(grepl(s,  Large, ignore.case = TRUE), "South",
+                      ifelse(grepl(n,  Large, ignore.case = TRUE), "North",
+                      ifelse(grepl(w, Large,  ignore.case = TRUE), "WestSide",
+                      ifelse(grepl(c, Large,  ignore.case = TRUE), "Central", 1))))))))), as.character(smallCoded)))
+
+
+dataMutc
+dataMutc %>% filter(smallCoded == 1) 
+
+```
+
+```{r}
+write.csv(dataMutc, file = "C:/Users/the36/Desktop/DataRA/exports/chicagoClean.csv")
+```
+
+
+Need to assign those in the suburb category to a FarNorth, FarSouth, West. 
+
+```{r}
+dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1) %>% 
+  group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% 
+  arrange(desc(count))
+```
+
+```{r}
+dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1) %>% 
+  group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% 
+  arrange(desc(count))
+```
+
+Calculate a misclassification rate. 
+14,213 observations have both a fine and coarse geogrpahy. 
+Can create a new column 'largeCoded' and compare the calculated column to the new large column.
+
+```{r}
+dataMut1 <- dataMutc %>% filter(Small != "" & Large != "")
+
+dataMut2 <- dataMut1 %>% mutate(largeCoded = ifelse(smallCoded != "", ifelse(grepl(fn, Large, ignore.case = TRUE), "FarNorth",
+                      ifelse(grepl(nw, Large, ignore.case = TRUE), "NorthWest",
+                      ifelse(grepl(fsw,Large, ignore.case = TRUE), "FarSouthWest",
+                      ifelse(grepl(sw, Large, ignore.case = TRUE), "SouthWest",
+                      ifelse(grepl(fse,Large, ignore.case = TRUE), "FarSouthEast",
+                      ifelse(grepl(s,  Large, ignore.case = TRUE), "South",
+                      ifelse(grepl(n,  Large, ignore.case = TRUE), "North",
+                      ifelse(grepl(w, Large,  ignore.case = TRUE), "WestSide",
+                      ifelse(grepl(c, Large,  ignore.case = TRUE), "Central", 1))))))))), ""))
+
+dataMut2
+```
+
+
+
+First Misclassification and Confusion Matrix
+
+```{r}
+dataMut3 <- dataMut2 %>% mutate(validation = ifelse(smallCoded != largeCoded, 1, 0))
+
+dataMut4 <- dataMut3 %>% filter(validation == 1)
+
+dataMut4
+
+dim(dataMut4)[1]/14336 
+```
+
+```{r}
+table <- dataMut4 %>% dplyr::select(smallCoded, largeCoded)
+table(table)
+```
+
+
+
+
+
+
+
+
+
+```{r}
+confusion <- dataMut2 %>% 
+  mutate(testSmall = ifelse(grepl("South", smallCoded, ignore.case = TRUE), "South",
+                      ifelse(grepl("North", smallCoded, ignore.case = TRUE), "North", as.character(smallCoded))))
+
+confusion2 <- confusion %>% 
+  mutate(testLarge = ifelse(grepl("South", largeCoded, ignore.case = TRUE), "South",
+                      ifelse(grepl("North", largeCoded, ignore.case = TRUE), "North",  as.character(largeCoded))))
+
+confusion2
+```
+
+```{r}
+dataMut30 <- confusion2 %>% mutate(validation = ifelse(testSmall != testLarge, 1, 0))
+
+dataMut40 <- dataMut30 %>% filter(validation == 1)
+
+dataMut40
+
+dim(dataMut40)[1]/14336 
+```
+
+6% of results are being misclassified
+
+
+Confusion Matrix
+
+```{r}
+table <- confusion2 %>% dplyr::select(testSmall, testLarge)
+table(table)
+```
+
+
+Show an example of a failure that really isn't happenin(South Evanston)
+
+```{r}
+confusion2 %>% filter(testSmall != testLarge)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
