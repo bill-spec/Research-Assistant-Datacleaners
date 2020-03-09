@@ -1,0 +1,102 @@
+---
+title: "LA"
+author: "Bill Lang"
+date: "2/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+la <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_la.csv")
+la
+
+```
+
+
+```{r}
+searchColumnSend <- function (dataFrame, word_to_search_for,column_search, column_replaced){ 
+  
+  dataFrame <- dataFrame %>% mutate(newCol = ifelse(grepl(word_to_search_for, column_search, ignore.case = TRUE), as.character(column_search), as.character(column_replaced))) 
+  
+  return(dataFrame)
+}
+
+searchColumnSend(LA, "street", LA$Area, LA$Street)
+
+LA
+
+```
+
+
+```{r}
+LA <- la %>%  
+  dplyr::select(Year, Column, Area, Street, Hse.No) %>% 
+  mutate(Column = tolower(Column)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+LA
+```
+
+
+```{r}
+
+LA <- LA %>% unite(Address, Street:Hse.No, sep = " ", remove = FALSE) 
+
+LA$Address <- trimws(LA$Address, which = c("right"))
+
+LA <- LA %>% mutate(ifHouseNumberExistsAddress = ifelse((Hse.No != ""), Address, ""))
+
+LA <- LA %>% select(-Address)
+
+LA
+
+
+```
+
+
+```{r}
+
+LA$Column <- trimws(LA$Area, which = c("right"))
+
+data <- LA %>% group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data
+
+sum(data$count)
+
+sum(data$count[1:20])
+
+```
+
+
+```{r}
+
+#Street and House Number
+
+LA %>% filter(Street != "" & Hse.No != "") 
+
+#63,458 with full addresses
+
+LA %>% filter(Street == "" & Hse.No == "" & (Area != "" | Column != ""))
+
+#53,251 with either Column or Area
+
+#So 116709 total or 142276
+
+```
+
+```{r}
+
+
+
+```
+

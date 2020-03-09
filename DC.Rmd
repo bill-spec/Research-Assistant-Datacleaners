@@ -1,0 +1,133 @@
+---
+title: "DC"
+author: "Bill Lang"
+date: "2/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+DC <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_dc.csv")
+DC <- DC %>% filter(ï..Transcriber != "")
+DC
+```
+
+```{r}
+DC <- DC %>% 
+  select(Year, Column, Area, Street, Hse.No) %>% 
+  mutate(Column = tolower(Column)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+
+```
+
+```{r}
+DC <- DC %>% unite(Address, Street:Hse.No, sep = " ") 
+
+DC$Address <- trimws(DC$Address, which = c("right"))
+
+DC$Area <- trimws(DC$Area, which = c("right"))
+
+DC
+```
+
+
+```{r}
+data <- DC %>% group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data
+
+sum(data$count)
+
+sum(data$count[1:50])
+```
+
+```{r}
+DC %>% filter(Area == "")
+
+DC %>% filter(Area == "" & Address != "")
+```
+
+
+
+
+
+
+
+DC objective: create a new column with the default state being D.C. and reassign that column with either Virginia or Maryland.
+
+
+
+```{r}
+DC
+
+DC2 <- DC %>% mutate(State = "DC")
+
+DC3 <- DC2 %>% mutate(State = ifelse(grepl("virginia", Column, ignore.case = TRUE), "VA",   
+              ifelse(grepl("virginia", Area, ignore.case = TRUE), "VA", 
+              ifelse(grepl("virginia", Address, ignore.case = TRUE), "VA", "DC"))))
+DC3
+
+DC3 %>% group_by(State) %>% 
+  summarise(count = n())
+
+
+DC4 <- DC3 %>% mutate(State = ifelse(grepl("maryland", Column, ignore.case = TRUE), "MA",   
+              ifelse(grepl("maryland", Area, ignore.case = TRUE), "MA", 
+              ifelse(grepl("maryland", Address, ignore.case = TRUE), "MA", as.character(State)))))
+DC4
+
+DC4 %>% group_by(State) %>% 
+  summarise(count = n())
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Area can maybe be used but is missing a lot.
+Column in useless.
+
+```{r}
+
+DC$Column <- trimws(DC$Column, which = c("right"))
+
+data <- DC %>% group_by(Column) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data
+
+sum(data$count)
+
+sum(data$count[1:20])
+
+```

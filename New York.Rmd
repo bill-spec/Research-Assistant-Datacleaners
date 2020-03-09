@@ -1,0 +1,125 @@
+---
+title: "New York"
+author: "Bill Lang"
+date: "2/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
+```
+
+```{r}
+newYork1 <- newYork %>% 
+  dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
+  mutate(Column.Location = tolower(Column.Location)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+```
+
+
+```{r}
+#Removing right adjustment
+newYork1$Column.Location <- trimws(newYork1$Column.Location, which = c("right"))
+
+
+#Manual Cleaning 
+newYork1$Column.Location <- sub("nj","new jersey", newYork1$Column.Location)
+newYork1$Column.Location <- sub("ny","new york", newYork1$Column.Location)
+newYork1$Column.Location <- sub("li","long island", newYork1$Column.Location)
+newYork1$Column.Location <- sub("-","", newYork1$Column.Location)
+newYork1$Column.Location <- sub("&","", newYork1$Column.Location)
+newYork1$Column.Location <- sub(" ","", newYork1$Column.Location)
+
+```
+
+Calculating Coarse and Fine Grography. 
+This is only using the data itself, no crosswalk is involved. 
+
+Column 
+
+```{r}
+data1 <- newYork1 %>% group_by(Column.Location) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data1
+
+sum(data1$count)
+
+sum(data1$count[1:20])
+
+pattern3 <- c("manhattan|westchester|newjersey|westside|eastside|queens|longisland|brooklyn|nassausuffolk|connecticut|bronx|queens& long island|newyork|westchestercounty|queenslongisland|statenisland")
+
+```
+
+Area 
+
+```{r}
+newYork1$Area <- trimws(newYork1$Area, which = c("right"))
+newYork1
+
+data <- newYork1 %>% group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data
+
+sum(data$count)
+
+sum(data$count[1:20])
+```
+
+How many have street and house number 
+
+```{r}
+dim(newYork %>% filter(Street != "" & Hse.No != ""))[1]
+```
+
+Mutating in a new Column: 
+Coarse.Geo
+
+```{r}
+newYorkExport <- newYork1 %>% mutate(Coarse.Geo = ifelse(grepl(pattern3, Column.Location, ignore.case = TRUE), as.character(Column.Location), 1))
+
+newYorkExport
+
+newYorkExport %>% filter(Coarse.Geo == 1)
+```
+
+Cleaning 
+
+```{r}
+newYorkExport %>% group_by(Coarse.Geo) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+
+newYorkExport$Coarse.Geo <- sub("county","", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub(" state","", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("queens long island","queens", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("queenslongisland","queens", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("queensand long island","queens", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("brooklynlongisland","brooklyn", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub(" st","", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("newengland","", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("manhattanbronx","manhattan", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("ville","", newYorkExport$Coarse.Geo)
+newYorkExport$Coarse.Geo <- sub("brooklynqueens","brooklyn", newYorkExport$Coarse.Geo)
+
+```
+
+
+
+```{r}
+write.csv(newYorkExport, file = "C:/Users/the36/Desktop/DataRA/exports/NewYorkClean.csv")
+```
+

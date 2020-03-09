@@ -1,0 +1,134 @@
+---
+title: "Boston"
+author: "Bill Lang"
+date: "1/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+
+```{r}
+boston <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_boston.csv", header = TRUE)
+boston
+
+dim(boston)
+```
+
+
+
+```{r}
+
+boston1 <- boston %>% 
+  dplyr::select(Year, Column, Area, Street,Hse.No, Cross.Street, Other.Location.Detail) %>% 
+  mutate(Column = tolower(Column)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+
+boston1 %>% filter(Area == "" & Hse.No != "")
+```
+ 
+```{r}
+boston$Area <- trimws(boston$Area, which = c("right"))
+
+data <- boston %>% group_by(Area) %>% 
+  summarise(
+    count = n()
+  ) %>% arrange(desc(count)) 
+
+data
+
+sum(data$count)
+
+sum(data$count[1:200])
+```
+
+
+
+```{r}
+
+boston1 <- boston %>% 
+  select(Year, Column, Area, Street) %>% 
+  mutate(Column = tolower(Column)) %>% 
+  mutate(Area = tolower(Area)) %>% 
+  mutate(Street = tolower(Street))
+boston1
+
+
+boston %>% 
+  group_by(Area) %>% 
+  summarise(
+    total = n()
+  ) %>% arrange(desc(total))
+
+
+
+
+
+
+bostona <- boston1 %>% 
+  mutate(Small = ifelse(grepl(allFine, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
+  mutate(Small = ifelse(grepl(allFine, Area, ignore.case = TRUE) & Small == "", as.character(Area), as.character(Small))) %>% 
+  mutate(Large = ifelse(grepl(allCoarse, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
+  mutate(Large = ifelse(grepl(allCoarse, Area, ignore.case = TRUE) & Large == "", as.character(Area), as.character(Large)))
+
+
+
+bostonb <- bostona %>% 
+  mutate(smallCoded = ifelse(grepl(, Small, ignore.case = TRUE), "", 
+              ifelse(grepl(, Small, ignore.case = TRUE), "", 
+              ifelse(grepl(, Small, ignore.case = TRUE), "", 
+              ifelse(grepl(, Small, ignore.case = TRUE), "",
+              ifelse(grepl(, Small, ignore.case = TRUE), "", 
+              ifelse(grepl(, Small, ignore.case = TRUE), "",
+              ifelse(grepl(, Small, ignore.case = TRUE), "",
+              ifelse(grepl(, Small, ignore.case = TRUE), "",
+              ifelse(grepl(, Small, ignore.case = TRUE), "",
+              ifelse(grepl(, Small, ignore.case = TRUE), "", 1)))))))))))
+
+dataMutb
+```
+
+
+
+```{r}
+dataMutb %>% 
+  group_by(smallCoded) %>% 
+  summarise(
+    total = n()
+  ) %>% arrange(desc(total))
+```
+
+
+
+```{r}
+
+
+dataMutc <- dataMutb %>% mutate(smallCoded = ifelse(smallCoded == 1, ifelse(grepl(fn, Large, ignore.case = TRUE), "FarNorth",
+                      ifelse(grepl(nw, Large, ignore.case = TRUE), "NorthWest",
+                      ifelse(grepl(fsw,Large, ignore.case = TRUE), "FarSouthWest",
+                      ifelse(grepl(sw, Large, ignore.case = TRUE), "SouthWest",
+                      ifelse(grepl(fse,Large, ignore.case = TRUE), "FarSouthEast",
+                      ifelse(grepl(s,  Large, ignore.case = TRUE), "South",
+                      ifelse(grepl(n,  Large, ignore.case = TRUE), "North",
+                      ifelse(grepl(w, Large,  ignore.case = TRUE), "West",
+                      ifelse(grepl(c, Large,  ignore.case = TRUE), "Central", 1))))))))), as.character(smallCoded)))
+
+dataMutc %>% filter(smallCoded == 1) 
+
+
+
+#Make this a function 
+
+dataMutc %>% 
+  group_by(smallCoded) %>% 
+  summarize(
+  total = n()
+) %>% 
+  arrange(desc(total))
+         
+```
