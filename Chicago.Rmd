@@ -154,6 +154,14 @@ dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1) %>%
   arrange(desc(count))
 ```
 
+
+
+
+
+
+
+
+
 Calculate a misclassification rate. 
 14,213 observations have both a fine and coarse geogrpahy. 
 Can create a new column 'largeCoded' and compare the calculated column to the new large column.
