@@ -20,21 +20,6 @@ la
 
 
 ```{r}
-searchColumnSend <- function (dataFrame, word_to_search_for,column_search, column_replaced){ 
-  
-  dataFrame <- dataFrame %>% mutate(newCol = ifelse(grepl(word_to_search_for, column_search, ignore.case = TRUE), as.character(column_search), as.character(column_replaced))) 
-  
-  return(dataFrame)
-}
-
-searchColumnSend(LA, "street", LA$Area, LA$Street)
-
-LA
-
-```
-
-
-```{r}
 LA <- la %>%  
   dplyr::select(Year, Column, Area, Street, Hse.No) %>% 
   mutate(Column = tolower(Column)) %>% 

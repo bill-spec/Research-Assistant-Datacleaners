@@ -23,13 +23,13 @@ dim(boston)
 
 ```{r}
 
-boston1 <- boston %>% 
+boston <- boston %>% 
   dplyr::select(Year, Column, Area, Street,Hse.No, Cross.Street, Other.Location.Detail) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
   mutate(Street = tolower(Street))
 
-boston1 %>% filter(Area == "" & Hse.No != "")
+boston %>% filter(Area == "" & Hse.No != "")
 ```
  
 ```{r}
@@ -44,13 +44,27 @@ data
 
 sum(data$count)
 
-sum(data$count[1:200])
+data2 <- data %>% filter(Area != "")
+sum(data2$count[1:200])
+```
+
+```{r}
+boston2 <- boston %>% mutate(Area2 = ifelse(grepl(paste(data2$Area[1:200],collapse="|"), Area), as.character(Area), 1))
+boston2 %>% filter(Area2 == 1)
 ```
 
 
 
-```{r}
 
+
+
+
+
+
+
+
+
+```{r}
 boston1 <- boston %>% 
   select(Year, Column, Area, Street) %>% 
   mutate(Column = tolower(Column)) %>% 
@@ -75,9 +89,10 @@ bostona <- boston1 %>%
   mutate(Small = ifelse(grepl(allFine, Area, ignore.case = TRUE) & Small == "", as.character(Area), as.character(Small))) %>% 
   mutate(Large = ifelse(grepl(allCoarse, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
   mutate(Large = ifelse(grepl(allCoarse, Area, ignore.case = TRUE) & Large == "", as.character(Area), as.character(Large)))
+```
 
 
-
+```{r}
 bostonb <- bostona %>% 
   mutate(smallCoded = ifelse(grepl(, Small, ignore.case = TRUE), "", 
               ifelse(grepl(, Small, ignore.case = TRUE), "", 
@@ -122,13 +137,5 @@ dataMutc %>% filter(smallCoded == 1)
 
 
 
-#Make this a function 
-
-dataMutc %>% 
-  group_by(smallCoded) %>% 
-  summarize(
-  total = n()
-) %>% 
-  arrange(desc(total))
          
 ```

@@ -46,8 +46,22 @@ data
 
 sum(data$count)
 
-sum(data$count[1:50])
+data2 <- data %>% filter(Area != "")
+sum(data2$count[1:50])
 ```
+
+```{r}
+excelDC <- boston %>% mutate(Area2 = ifelse(grepl(paste(data2$Area[1:50],collapse="|"), Area), as.character(Area), 1))
+excelDC %>% filter(Area2 == 1)
+```
+
+
+
+
+
+
+
+
 
 ```{r}
 DC %>% filter(Area == "")

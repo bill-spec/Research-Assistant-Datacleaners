@@ -117,6 +117,9 @@ newYorkExport$Coarse.Geo <- sub("brooklynqueens","brooklyn", newYorkExport$Coars
 
 ```
 
+```{r}
+newYorkExport
+```
 
 
 ```{r}
