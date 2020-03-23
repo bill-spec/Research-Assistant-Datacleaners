@@ -10,9 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(dplyr)
 library(tidyverse)
-library(ggplot2)
 ```
 
 
@@ -59,13 +57,11 @@ farsouthWest <- c("Ashburn|Beverly View|Mary Crest|Parkview|Scottsdale|Wrightwoo
 nonCentral <- c("removethisvector")
 ```
 
-
-
 ```{r}
 data <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_chicago.csv")
 
 data1 <- data %>% 
-  dplyr::select(Year, Column, Area, Street) %>% 
+  #dplyr::select(Year, Column, Area, Street) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
   mutate(Street = tolower(Street))
@@ -130,7 +126,7 @@ dataMutc %>% filter(smallCoded == 1)
 ```
 
 ```{r}
-write.csv(dataMutc, file = "C:/Users/the36/Desktop/DataRA/exports/chicagoClean.csv")
+#write.csv(dataMutc, file = "C:/Users/the36/Desktop/DataRA/exports/chicagoClean.csv")
 ```
 
 

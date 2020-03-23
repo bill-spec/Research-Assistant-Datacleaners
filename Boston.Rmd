@@ -14,9 +14,7 @@ library(tidyverse)
 
 ```{r}
 boston <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_boston.csv", header = TRUE)
-boston
-
-dim(boston)
+boston %>% group_by(Price.type) %>% summarise(n = n())
 ```
 
 

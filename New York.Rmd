@@ -7,13 +7,12 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
 library(tidyverse)
-library(ggplot2)
 ```
 
 ```{r}
 newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
+newYork %>% group_by(Price.type) %>% summarise(n = n())
 ```
 
 ```{r}

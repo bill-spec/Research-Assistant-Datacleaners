@@ -86,7 +86,8 @@ DC2 <- DC %>% mutate(State = "DC")
 
 DC3 <- DC2 %>% mutate(State = ifelse(grepl("virginia", Column, ignore.case = TRUE), "VA",   
               ifelse(grepl("virginia", Area, ignore.case = TRUE), "VA", 
-              ifelse(grepl("virginia", Address, ignore.case = TRUE), "VA", "DC"))))
+              ifelse(grepl("virginia", Street, ignore.case = TRUE), "VA",
+              ifelse(grepl("virginia", Hse.No, ignore.case = TRUE), "VA", "DC")))))
 DC3
 
 DC3 %>% group_by(State) %>% 
@@ -95,7 +96,8 @@ DC3 %>% group_by(State) %>%
 
 DC4 <- DC3 %>% mutate(State = ifelse(grepl("maryland", Column, ignore.case = TRUE), "MA",   
               ifelse(grepl("maryland", Area, ignore.case = TRUE), "MA", 
-              ifelse(grepl("maryland", Address, ignore.case = TRUE), "MA", as.character(State)))))
+              ifelse(grepl("maryland", Street, ignore.case = TRUE), "MA", 
+              ifelse(grepl("maryland", Hse.No, ignore.case = TRUE), "MA", as.character(State))))))
 DC4
 
 DC4 %>% group_by(State) %>% 
@@ -104,6 +106,9 @@ DC4 %>% group_by(State) %>%
 
 ```
 
+```{r}
+write.csv("C:/Users/the36/Desktop/DC/DCWithState.csv")
+```
 
 
 
