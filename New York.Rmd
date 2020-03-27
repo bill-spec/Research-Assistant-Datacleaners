@@ -12,15 +12,15 @@ library(tidyverse)
 
 ```{r}
 newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
-newYork %>% group_by(Price.type) %>% summarise(n = n())
 ```
 
 ```{r}
 newYork1 <- newYork %>% 
-  dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
+  #dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
   mutate(Column.Location = tolower(Column.Location)) %>% 
   mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street))
+  mutate(Street = tolower(Street)) %>% 
+  mutate(Price.type = tolower(Price.type))
 ```
 
 

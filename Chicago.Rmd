@@ -64,7 +64,8 @@ data1 <- data %>%
   #dplyr::select(Year, Column, Area, Street) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street))
+  mutate(Street = tolower(Street)) %>% 
+  mutate(Price.type = tolower(Price.type))
   
 dataMuta <- data1 %>% 
   mutate(Small = ifelse(grepl(allFine, Column, ignore.case = TRUE), as.character(Column), "")) %>% 
@@ -142,14 +143,23 @@ dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1) %>%
 ```
 
 ```{r}
-dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1) %>% 
+frame <- dataMutc %>% filter(Large == "" & Area != "" & smallCoded == 1 & Area != "suburban") %>% 
   group_by(Area) %>% 
   summarise(
     count = n()
   ) %>% 
   arrange(desc(count))
+frame
 ```
 
+
+
+```{r}
+chicago <- dataMutc %>% mutate(smallCoded = ifelse(Large == "" & Area != "" & smallCoded == 1 & grepl(paste(frame$Area[1:191],collapse="|"),Area), 2, as.character(smallCoded)))
+chicago %>% filter(smallCoded == 1)
+dataMutc %>% filter(smallCoded == 1)
+chicago
+```
 
 
 

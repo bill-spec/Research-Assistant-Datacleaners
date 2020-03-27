@@ -22,10 +22,11 @@ boston %>% group_by(Price.type) %>% summarise(n = n())
 ```{r}
 
 boston <- boston %>% 
-  dplyr::select(Year, Column, Area, Street,Hse.No, Cross.Street, Other.Location.Detail) %>% 
+  #dplyr::select(Year, Column, Area, Street,Hse.No, Cross.Street, Other.Location.Detail) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street))
+  mutate(Street = tolower(Street)) %>% 
+  mutate(Price.type = tolower(Price.type))
 
 boston %>% filter(Area == "" & Hse.No != "")
 ```
@@ -43,11 +44,11 @@ data
 sum(data$count)
 
 data2 <- data %>% filter(Area != "")
-sum(data2$count[1:200])
+sum(data2$count[1:437])
 ```
 
 ```{r}
-boston2 <- boston %>% mutate(Area2 = ifelse(grepl(paste(data2$Area[1:200],collapse="|"), Area), as.character(Area), 1))
+boston2 <- boston %>% mutate(Area2 = ifelse(grepl(paste(data2$Area[1:437],collapse="|"), Area), as.character(Area), 1))
 boston2 %>% filter(Area2 == 1)
 ```
 
