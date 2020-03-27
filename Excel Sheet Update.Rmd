@@ -126,28 +126,28 @@ excelDataFound(dataFrame = chicago, year = chicago$Year, column = chicago$smallC
 New York
 
 ```{r}
-totalRentOrOwn(newYorkExport, newYorkExport$Year, newYorkExport$Price.type)
-excelDataFound(newYorkExport, newYorkExport$Year, newYorkExport$Coarse.Geo, newYorkExport$Price.type)
+totalRentOrOwn(newYorkExport, newYorkExport$Year, priceColumn = newYorkExport$Price.type)
+excelDataFound(newYorkExport, year = newYorkExport$Year, column = newYorkExport$Coarse.Geo,priceColumn =  newYorkExport$Price.type)
 ```
 
 Boston 
  #use at least 5 obs 
 ```{r}
-totalRentOrOwn(boston2, boston2$Year, boston2$Price.type)
-excelData(boston2, boston2$Year, boston2$Area2, boston2$Price.type)
+totalRentOrOwn(boston2, boston2$Year, priceColumn = boston2$Price.type)
+excelDataFound(boston2, year = boston2$Year, column = boston2$Area2, priceColumn = boston2$Price.type)
 ```
 
 DC 
 
 ```{r}
-totalRentOrOwn(excelDC, excelDC$Year, excelDC$Price.type)
-excelData(excelDC, excelDC$Year, excelDC$Area2,excelDC$Price.type)
+totalRentOrOwn(excelDC, excelDC$Year, priceColumn = excelDC$Price.type)
+excelDataFound(excelDC, year = excelDC$Year, column = excelDC$Area2, priceColumn = excelDC$Price.type)
 ```
 
 LA 
 
 ```{r}
-
+totalRentOrOwn(LA, LA$Year, priceColumn = LA$Price.type)
 ```
 
 
