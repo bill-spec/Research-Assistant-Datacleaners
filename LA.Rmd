@@ -7,9 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
 library(tidyverse)
-library(ggplot2)
 ```
 
 ```{r}
@@ -21,10 +19,11 @@ la
 
 ```{r}
 LA <- la %>%  
-  dplyr::select(Year, Column, Area, Street, Hse.No) %>% 
+  #dplyr::select(Year, Column, Area, Street, Hse.No) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street))
+  mutate(Street = tolower(Street)) %>% 
+  mutate(Price.type = tolower(Price.type))
 LA
 ```
 

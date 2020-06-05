@@ -10,16 +10,21 @@ library(tidyverse)
 ```
 
 ```{r}
+<<<<<<< HEAD
 newYork <- read.csv("C:/Users/Billy/Desktop/hipHop/hiphop_nyc_CSV.csv", nrows = 118095)
 newYork %>% group_by(Price.type) %>% summarise(n = n())
+=======
+newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
+>>>>>>> db59fa11d54c4c7e244bad4bc70a709b9190c785
 ```
 
 ```{r}
 newYork1 <- newYork %>% 
-  dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
+  #dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
   mutate(Column.Location = tolower(Column.Location)) %>% 
   mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street))
+  mutate(Street = tolower(Street)) %>% 
+  mutate(Price.type = tolower(Price.type))
 ```
 
 

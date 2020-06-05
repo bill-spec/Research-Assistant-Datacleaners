@@ -23,7 +23,7 @@ FID, Intersection (title must be 'names')
 
 
 ```{r}
-key1880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_intersection_key.csv")
+
 key1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_intersection_key.csv")
 key1880and1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/both_1880_and_1900_intersection_key.csv")
 
@@ -53,6 +53,10 @@ search1900
 1880 Batch 1
 
 ```{r}
+
+key1880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_intersection_key.csv")
+
+
 search11880
 search11880_noNA <- removeMissingRows(search11880)
 
@@ -71,7 +75,6 @@ LookUp(search21880, key1880, "First", "Second")
 ```
 
 
-
 1900 
 
 ```{r}
@@ -79,8 +82,8 @@ head(key1900)
 head(search1900)
 head(key1880and1900)
 
-LookUp(s1900,key1880and1900,"First")
-LookUp(s1900,key1880and1900,"Second")
+LookUp(search1900, key1880and1900, "First", "Second")
+
 ```
 
 ```{r}
@@ -95,8 +98,7 @@ s1900 <- s1900 %>% filter(!grepl("property", First))
 s1900
 
 
-if(row contains property)
-  repeat the observation above 
+
 ```
 
 

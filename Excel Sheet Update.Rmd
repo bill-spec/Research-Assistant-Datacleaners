@@ -113,48 +113,41 @@ test2 <- excelDataFound(dataMutc, dataMutc$Year, column = dataMutc$smallCoded, p
 test2
 ```
 
-```{r}
-joinFunctiion <- function(dfFound, dfTotal){
-  
-  df <- merge(dfFound, dfTotal, by = 0) %>% select(-Row.names)
-  rownames(df) <- c(1890,1900,1910,1920,1930,1940,1950,1960,1970,1980,1990)
-  return(df)
-  
-}
-```
-
-
 
 Chicago 
 
 #add everything with greater than 4 obseervations
 
 ```{r}
-excelData(dataFrame = dataMutc, year = dataMutc$Year, column = dataMutc$smallCoded)
+totalRentOrOwn(dataMutc, dataMutc$Year, priceColumn = dataMutc$Price.type)
+excelDataFound(dataFrame = chicago, year = chicago$Year, column = chicago$smallCoded, priceColumn = chicago$Price.type)
 ```
 
 New York
 
 ```{r}
-excelData(newYorkExport, newYorkExport$Year, newYorkExport$Coarse.Geo)
+totalRentOrOwn(newYorkExport, newYorkExport$Year, priceColumn = newYorkExport$Price.type)
+excelDataFound(newYorkExport, year = newYorkExport$Year, column = newYorkExport$Coarse.Geo,priceColumn =  newYorkExport$Price.type)
 ```
 
 Boston 
  #use at least 5 obs 
 ```{r}
-excelData(boston2, boston2$Year, boston2$Area2)
+totalRentOrOwn(boston2, boston2$Year, priceColumn = boston2$Price.type)
+excelDataFound(boston2, year = boston2$Year, column = boston2$Area2, priceColumn = boston2$Price.type)
 ```
 
 DC 
 
 ```{r}
-excelData(excelDC, excelDC$Year, excelDC$Area2)
+totalRentOrOwn(excelDC, excelDC$Year, priceColumn = excelDC$Price.type)
+excelDataFound(excelDC, year = excelDC$Year, column = excelDC$Area2, priceColumn = excelDC$Price.type)
 ```
 
 LA 
 
 ```{r}
-
+totalRentOrOwn(LA, LA$Year, priceColumn = LA$Price.type)
 ```
 
 
