@@ -1,0 +1,104 @@
+---
+title: "Matching"
+author: "Bill Lang"
+date: "6/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+
+Standard Format
+
+Search 
+ID, Street1&Street2, Street2&Street1
+
+Key
+FID, Intersection (title must be 'names')
+
+
+
+```{r}
+key1880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_intersection_key.csv")
+key1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_intersection_key.csv")
+key1880and1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/both_1880_and_1900_intersection_key.csv")
+
+
+search11880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_first_batch.csv")
+search21880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_second_batch_.csv")
+search1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch.csv")
+search1900simple <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch_.csv")
+```
+
+```{r}
+head(key1880);head(key1900);head(key1880and1900)
+
+key1880 <- cleanIntersection(key1880)
+key1900 <- cleanIntersection(key1900)
+key1880and1900 <- cleanIntersection(key1880and1900)
+
+head(key1880);head(key1900);head(key1880and1900)
+```
+
+```{r}
+search11880
+search21880
+search1900
+```
+
+1880 Batch 1
+
+```{r}
+search11880
+search11880_noNA <- removeMissingRows(search11880)
+
+LookUp(search11880_noNA, key1880, "First", "Second")
+```
+
+
+1880 Batch 2
+
+```{r}
+search21880 <- cleanSearch(search21880)
+
+search21880
+
+LookUp(search21880, key1880, "First", "Second")
+```
+
+
+
+1900 
+
+```{r}
+head(key1900)
+head(search1900)
+head(key1880and1900)
+
+LookUp(s1900,key1880and1900,"First")
+LookUp(s1900,key1880and1900,"Second")
+```
+
+```{r}
+s1900 <- cleanSearch(search1900simple)
+k1900 <- cleanIntersection(key1900)
+```
+
+```{r}
+s1900
+
+s1900 <- s1900 %>% filter(!grepl("property", First))
+s1900
+
+
+if(row contains property)
+  repeat the observation above 
+```
+
+
+
+

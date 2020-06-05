@@ -6,12 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
 ```{r}
-newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
+newYork <- read.csv("C:/Users/Billy/Desktop/hipHop/hiphop_nyc_CSV.csv", nrows = 118095)
 newYork %>% group_by(Price.type) %>% summarise(n = n())
 ```
 
@@ -45,6 +44,7 @@ This is only using the data itself, no crosswalk is involved.
 Column 
 
 ```{r}
+
 data1 <- newYork1 %>% group_by(Column.Location) %>% 
   summarise(
     count = n()
