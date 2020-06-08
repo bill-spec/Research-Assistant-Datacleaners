@@ -12,95 +12,211 @@ library(tidyverse)
 
 
 
-Standard Format
+Standard Format of CSVs
 
 Search 
-ID, Street1&Street2, Street2&Street1
-
+ID, First, Second
+or
+ID, names
 Key
-FID, Intersection (title must be 'names')
+FID, names
 
 
-
-```{r}
-
-key1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_intersection_key.csv")
-key1880and1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/both_1880_and_1900_intersection_key.csv")
-
-
-search11880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_first_batch.csv")
-search21880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_second_batch_.csv")
-search1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch.csv")
-search1900simple <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch_.csv")
-```
-
-```{r}
-head(key1880);head(key1900);head(key1880and1900)
-
-key1880 <- cleanIntersection(key1880)
-key1900 <- cleanIntersection(key1900)
-key1880and1900 <- cleanIntersection(key1880and1900)
-
-head(key1880);head(key1900);head(key1880and1900)
-```
-
-```{r}
-search11880
-search21880
-search1900
-```
 
 1880 Batch 1
 
 ```{r}
-
 key1880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_intersection_key.csv")
+search11880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_first_batch.csv")
+```
 
 
-search11880
+```{r}
 search11880_noNA <- removeMissingRows(search11880)
+key1880 <- cleanIntersection(key1880)
+```
 
+```{r}
+head(search11880)
+head(key1880)
+```
+
+
+```{r}
 LookUp(search11880_noNA, key1880, "First", "Second")
 ```
+
+
+
 
 
 1880 Batch 2
 
 ```{r}
+key1880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_intersection_key.csv")
+search21880 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_second_batch_.csv")
+```
+
+```{r}
 search21880 <- cleanSearch(search21880)
+key1880 <- cleanIntersection(key1880)
+```
 
-search21880
+```{r}
+head(search21880)
+head(key1880)
+```
 
+
+```{r}
 LookUp(search21880, key1880, "First", "Second")
 ```
 
 
+
 1900 
+
+
+```{r}
+key1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_intersection_key.csv")
+key1880and1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/both_1880_and_1900_intersection_key.csv")
+
+search1900OLD <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch.csv")
+search1900 <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1900/1900_batch_.csv")
+```
+
+```{r}
+key1900 <- cleanIntersection(key1900)
+key1880and1900 <- cleanIntersection(key1880and1900)
+
+search1900 <- cleanSearch(search1900simple) %>% filter(!grepl("same", First))
+```
 
 ```{r}
 head(key1900)
-head(search1900)
 head(key1880and1900)
+head(search1900)
+```
 
-LookUp(search1900, key1880and1900, "First", "Second")
+First checking the 1900 key then the 1900 and 1880 key
 
+```{r}
+key1900Only <- LookUp(search1900, key1900, "First","Second")
 ```
 
 ```{r}
-s1900 <- cleanSearch(search1900simple)
-k1900 <- cleanIntersection(key1900)
+IDsAlreadyFound <- key1900Only$ID 
+
+stillNeedFound <- search1900 %>% filter(!ID %in% IDsAlreadyFound)
+stillNeedFound <- LookUp(stillNeedFound, key1880and1900, "First", "Second")
 ```
 
 ```{r}
-s1900
-
-s1900 <- s1900 %>% filter(!grepl("property", First))
-s1900
-
-
-
+key1900Only; stillNeedFound
+total <- rbind(key1900Only, stillNeedFound)
+total
 ```
 
+```{r}
+IDTotalFound <- total$ID
+needFound <- search1900 %>% filter(!ID %in% IDTotalFound)
+```
+
+```{r}
+needFound
+```
+
+Manuel Checks and Additions
+
+```{r}
+library(fuzzyjoin); library(dplyr)
+
+fuzzy <- stringdist_join(needFound,key1900,
+                by = c("First" = "intersection"),
+                mode = "left",
+                ignore_case = TRUE, 
+                method = "lv", 
+                max_dist = 4, 
+                distance_col = "dist") %>%
+  group_by(First) %>%
+  top_n(1, -dist)
+
+fuzzy %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)& !grepl('1|2|3|4|5|6|7|8|9|0', intersection)) %>% arrange(dist)
 
 
+
+additionIDs <- c(88,138,249,330,1275,607,997,1249,1359,1380,685,1115,2148)
+additionsDF <- fuzzy %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)) %>% filter(ID %in% additionIDs) %>% select(-dist)
+additionsDF <- additionsDF[-c(4,11),] %>% select(-intersection)
+additionsDF[4] <- as.character(additionsDF$ï..FID)
+additionsDF
+```
+
+```{r}
+fuzzy2 <- stringdist_join(needFound,key1900,
+                by = c("Second" = "intersection"),
+                mode = "left",
+                ignore_case = TRUE, 
+                method = "lv", 
+                max_dist = 4, 
+                distance_col = "dist") %>%
+  group_by(Second) %>%
+  top_n(1, -dist)
+
+
+fuzzy2 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0', Second) & !grepl('1|2|3|4|5|6|7|8|9|0', intersection)) %>% arrange(dist)
+
+
+additionIDs <- c(832,1326,1808,1811,2090,2213,1984)
+additionsDF2 <- fuzzy2 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)) %>% filter(ID %in% additionIDs) %>% select(-intersection, -dist)
+additionsDF2[4] <- as.character(additionsDF2$ï..FID)
+additionsDF2
+```
+
+```{r}
+fuzzy3 <- stringdist_join(needFound,key1880and1900,
+                by = c("First" = "intersection"),
+                mode = "left",
+                ignore_case = TRUE, 
+                method = "lv", 
+                max_dist = 4, 
+                distance_col = "dist") %>%
+  group_by(First) %>%
+  top_n(1, -dist)
+
+fuzzy3 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)& !grepl('1|2|3|4|5|6|7|8|9|0', intersection)) %>% filter(!grepl("B",ï..FID)) %>% arrange(dist)
+
+
+
+additionIDs <- c(1866)
+additionsDF3 <- fuzzy3 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)) %>% filter(ID %in% additionIDs) %>% select(-dist)
+additionsDF3 <- additionsDF3 %>% select(-intersection)
+additionsDF3
+```
+
+```{r}
+fuzzy4 <- stringdist_join(needFound,key1880and1900,
+                by = c("Second" = "intersection"),
+                mode = "left",
+                ignore_case = TRUE, 
+                method = "lv", 
+                max_dist = 4, 
+                distance_col = "dist") %>%
+  group_by(Second) %>%
+  top_n(1, -dist)
+
+
+fuzzy4 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0', Second) & !grepl('1|2|3|4|5|6|7|8|9|0', intersection)) %>% filter(!grepl("B",ï..FID)) %>% arrange(dist)
+
+
+additionIDs <- c(25,1326,1718,1792,1807,117)
+additionsDF4 <- fuzzy2 %>% filter(!grepl('1|2|3|4|5|6|7|8|9|0',First)) %>% filter(ID %in% additionIDs) %>% select(-intersection, -dist)
+additionsDF4
+```
+
+```{r}
+allAdd <- rbind(additionsDF, additionsDF2, additionsDF3, additionsDF4)
+allFound <- rbind(total,allAdd)
+allFound
+```
 

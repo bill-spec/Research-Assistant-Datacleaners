@@ -11,56 +11,23 @@ library(tidyverse)
 library(english)
 ```
 
-```{r}
-intersectionCSV <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/1900/chicago_intersections1900.csv")
-needsMatchingCSV <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/1900/1900geosnongoogle.csv", header = FALSE)
-```
-
-```{r}
-names(intersectionCSV)[1] <- "FID" 
-names(intersectionCSV)[4] <- "names" 
-intersection <- intersectionCSV %>% select(FID, names)
-intersection
-```
-
-```{r}
-search <- needsMatchingCSV[,c(3,1,2)]
-search
-```
-
-Looking Up
-
-```{r}
-key <- cleanIntersection(intersection)
-LookUp(search, key, "V1");LookUp(search, key, "V2")
-```
-
 
 Example
 
 ```{r}
-df1 <- data.frame("ID" = 1:4, "x1" = c("forbes&10th","board&124th", "&5th", "fake&"), "x2" = c("10th&forbes","124th&board", "5th&", "&fake"))
+df1 <- data.frame("ID" = 1:5, "x1" = c("forbes&10th","board&124th", "&5th", "fake&","board&124th"), "x2" = c("10th&forbes","124th&board", "5th&", "&fake","board&124th"))
 df2 <- data.frame("FID" = 1:6, "hello" = c("forbes&10th","board&124th", "&lincoln", "forbes&11th", "forbes&12th", "forbes&13th"))
 ```
 
 
 ```{r}
-LookUp(df1, df2, "x1")
-```
-
-Remove Missing Rows
-
-```{r}
-removeMissingRows <- function(dataframe){
-  noMissingRows <- filter(dataframe, (dataframe[,2] != "" & dataframe[,3] != ""))
-  return(noMissingRows)
-}
+LookUp(df1, df2, "x1","x2")
 ```
 
 
 VlookUp Function
 
-```{r}
+```{r LookUp}
 LookUp <- function(dataframe_needs_matched, dataframe_key, first_column_to_search, second_column_to_search){
   
 names(dataframe_key)[2] <- first_column_to_search
@@ -71,8 +38,8 @@ merged2 <- inner_join(dataframe_needs_matched, dataframe_key, by = second_column
 
 merged <- rbind(merged1, merged2)
 
-cat("Key dataframe had", dim(dataframe_key)[1] ,"rows\n")
-cat("Search dataframe had", dim(dataframe_needs_matched)[1] ,"rows\n")
+cat("The key dataframe had", dim(dataframe_key)[1] ,"rows\n")
+cat("The search dataframe had", dim(dataframe_needs_matched)[1] ,"rows\n")
 cat("This search found", dim(merged)[1], "or", dim(merged)[1]/dim(dataframe_needs_matched)[1],"\n")
 
 return(merged)
@@ -86,13 +53,12 @@ Clean Intersections
 dataframe must have 
 FID, names
 
-```{r}
+```{r Clean Intersection Key}
 cleanIntersection <- function(dataFrame){
 
 #all to lowercase 
   
 dataFrame$names <- tolower(dataFrame$names)
-
 
 splitStreets <- separate(dataFrame,names,into = c("street1","street2"),sep = "&")
 
@@ -102,7 +68,7 @@ firstStreetSplit <- separate(splitStreets,"street1",into = c("x1","x2","x3","x4"
 firstStreetSplit
 
 #Text to blank
-textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$")
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
 
 for(i in 1:4){
 cola <- paste('x', i, sep= '')
@@ -148,7 +114,7 @@ secondStreetSplit <- separate(firstStreetMerged,"street2",into = c("x1","x2","x3
 #secondStreetSplit
 
 #Text to blank
-textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$")
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
 
 for(i in 1:4){
 cola <- paste('x', i, sep= '')
@@ -196,13 +162,14 @@ Clean Search
 dataframe needs to have 
 Id, intersection (seperated by ' and ')
 
-```{r}
+```{r Clean Search Key}
 cleanSearch <- function(dataFrame){
 
 #all to lowercase 
   
 dataFrame$intersection <- tolower(dataFrame$intersection)
 
+dataFrame <- dataFrame %>% filter(grepl(" and ", intersection))
 
 #Split into two streets by ' and '
 
@@ -220,7 +187,7 @@ firstStreetSplit <- separate(splitStreets,"street1",into = c("x1","x2","x3","x4"
 firstStreetSplit
 
 #Text to blank
-textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$","^st.$")
 
 for(i in 1:4){
 cola <- paste('x', i, sep= '')
@@ -232,19 +199,15 @@ firstStreetSplit[is.na(firstStreetSplit)] <- ""
 
 #repalcement for 1900 
 
-text <- c("2d","3d")
-replace <- c("2nd","3rd")
 
-for(k in 1:2){
-  tempText <- text[k]
-  tempReplace <- replace[k]
-  
-for(i in 1:4){
-cola <- paste('x', i, sep= '')
-firstStreetSplit[[cola]] <- ifelse(grepl(tempText, firstStreetSplit[[cola]]), tempReplace , as.character(firstStreetSplit[[cola]]))
+ firstStreetSplit <- data.frame(lapply(firstStreetSplit, function(x) {
+                  gsub("2d", "2nd", x)
+             }))
+ firstStreetSplit <- data.frame(lapply(firstStreetSplit, function(x) {
+                  gsub("3d", "3rd", x)
+             }))
 
-}
-}
+
 
 #Text numbers to numbers 
 
@@ -319,7 +282,7 @@ secondStreetSplit <- separate(firstStreetMerged,"street2",into = c("x1","x2","x3
 #secondStreetSplit
 
 #Text to blank
-textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$","^st.$")
 
 for(i in 1:4){
 cola <- paste('x', i, sep= '')
@@ -328,23 +291,6 @@ secondStreetSplit[[cola]] <- ifelse(grepl(paste(textToBlank,collapse="|"), secon
 
 #NA to blank
 secondStreetSplit[is.na(secondStreetSplit)] <- ""
-
-#replacements for 1900
-
-
-text <- c("2d","3d")
-replace <- c("2nd","3rd")
-
-for(k in 1:2){
-  tempText <- text[k]
-  tempReplace <- replace[k]
-  
-for(i in 1:4){
-cola <- paste('x', i, sep= '')
-secondStreetSplit[[cola]] <- ifelse(grepl(tempText, secondStreetSplit[[cola]]), tempReplace , as.character(secondStreetSplit[[cola]]))
-
-}
-}
 
 
 #Ordinal Numbers 
