@@ -1,30 +1,5 @@
----
-title: "New York"
-author: "Bill Lang"
-date: "2/5/2020"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-```
-
-```{r}
 newYork <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_nyc.csv")
-```
 
-```{r}
-newYork1 <- newYork %>% 
-  #dplyr::select(Year, Column.Location, Area, Street, Hse.No) %>% 
-  mutate(Column.Location = tolower(Column.Location)) %>% 
-  mutate(Area = tolower(Area)) %>% 
-  mutate(Street = tolower(Street)) %>% 
-  mutate(Price.type = tolower(Price.type))
-```
-
-
-```{r}
 #Removing right adjustment
 newYork1$Column.Location <- trimws(newYork1$Column.Location, which = c("right"))
 
@@ -37,70 +12,13 @@ newYork1$Column.Location <- sub("-","", newYork1$Column.Location)
 newYork1$Column.Location <- sub("&","", newYork1$Column.Location)
 newYork1$Column.Location <- sub(" ","", newYork1$Column.Location)
 
-```
-
-Calculating Coarse and Fine Grography. 
-This is only using the data itself, no crosswalk is involved. 
-
-Column 
-
-```{r}
-data1 <- newYork1 %>% group_by(Column.Location) %>% 
-  summarise(
-    count = n()
-  ) %>% arrange(desc(count)) 
-
-data1
-
-sum(data1$count)
-
-sum(data1$count[1:20])
+#Saying that if it follows a certain pattern it is added to the new calculated column
 
 pattern3 <- c("manhattan|westchester|newjersey|westside|eastside|queens|longisland|brooklyn|nassausuffolk|connecticut|bronx|queens& long island|newyork|westchestercounty|queenslongisland|statenisland")
+newYorkExport <- newYork1 %>% mutate(Coarse.Geo = ifelse(
+  grepl(pattern3, Column.Location, ignore.case = TRUE), as.character(Column.Location), 1))
 
-```
-
-Area 
-
-```{r}
-newYork1$Area <- trimws(newYork1$Area, which = c("right"))
-newYork1
-
-data <- newYork1 %>% group_by(Area) %>% 
-  summarise(
-    count = n()
-  ) %>% arrange(desc(count)) 
-
-data
-
-sum(data$count)
-
-sum(data$count[1:20])
-```
-
-How many have street and house number 
-
-```{r}
-dim(newYork %>% filter(Street != "" & Hse.No != ""))[1]
-```
-
-Mutating in a new Column: 
-Coarse.Geo
-
-```{r}
-newYorkExport <- newYork1 %>% mutate(Coarse.Geo = ifelse(grepl(pattern3, Column.Location, ignore.case = TRUE), as.character(Column.Location), 1))
-
-newYorkExport
-
-newYorkExport %>% filter(Coarse.Geo == 1)
-```
-
-Cleaning 
-
-```{r}
-crossTable <- newYorkExport %>% group_by(Coarse.Geo) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count))
+#Cleaning the new column
 
 newYorkExport$Coarse.Geo <- sub("county","", newYorkExport$Coarse.Geo)
 newYorkExport$Coarse.Geo <- sub(" state","", newYorkExport$Coarse.Geo)
@@ -114,18 +32,13 @@ newYorkExport$Coarse.Geo <- sub("manhattanbronx","manhattan", newYorkExport$Coar
 newYorkExport$Coarse.Geo <- sub("ville","", newYorkExport$Coarse.Geo)
 newYorkExport$Coarse.Geo <- sub("brooklynqueens","brooklyn", newYorkExport$Coarse.Geo)
 
-```
+#showing the results
 
-```{r}
-newYorkExport
+crossTable <- newYorkExport %>% group_by(Coarse.Geo) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
 
+print('Total:')
 sum(crossTable$count)
-
+print('Found:')
 sum(crossTable$count[1:12])
-```
-
-
-```{r}
-write.csv(newYorkExport, file = "C:/Users/the36/Desktop/DataRA/exports/NewYorkClean.csv")
-```
-

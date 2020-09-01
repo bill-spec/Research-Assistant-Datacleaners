@@ -7,12 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
 library(tidyverse)
 ```
-
 
 ```{r}
 allCoarse <- c("North|South|Southwest|West|Loop|Central")
@@ -248,7 +244,7 @@ table(table)
 ```
 
 
-Show an example of a failure that really isn't happenin(South Evanston)
+Show an example of a failure that really isn't happening(South Evanston)
 
 ```{r}
 confusion2 %>% filter(testSmall != testLarge)
