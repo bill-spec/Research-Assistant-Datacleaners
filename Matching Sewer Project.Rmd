@@ -1,0 +1,380 @@
+---
+title: "Matching"
+author: "Bill Lang"
+date: "5/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(english)
+```
+
+
+Example
+
+```{r}
+df1 <- data.frame("ID" = 1:5, "x1" = c("forbes&10th","board&124th", "&5th", "fake&","board&124th"), "x2" = c("10th&forbes","124th&board", "5th&", "&fake","board&124th"))
+df2 <- data.frame("FID" = 1:6, "hello" = c("forbes&10th","board&124th", "&lincoln", "forbes&11th", "forbes&12th", "forbes&13th"))
+```
+
+
+```{r}
+LookUp(df1, df2, "x1","x2")
+```
+
+
+VlookUp Function
+
+```{r LookUp}
+LookUp <- function(dataframe_needs_matched, dataframe_key, first_column_to_search, second_column_to_search){
+  
+names(dataframe_key)[2] <- first_column_to_search
+merged1 <- inner_join(dataframe_needs_matched, dataframe_key, by = first_column_to_search)
+
+names(dataframe_key)[2] <- second_column_to_search
+merged2 <- inner_join(dataframe_needs_matched, dataframe_key, by = second_column_to_search)
+
+merged <- rbind(merged1, merged2)
+
+cat("The key dataframe had", dim(dataframe_key)[1] ,"rows\n")
+cat("The search dataframe had", dim(dataframe_needs_matched)[1] ,"rows\n")
+cat("This search found", dim(merged)[1], "or", dim(merged)[1]/dim(dataframe_needs_matched)[1],"\n")
+
+return(merged)
+}
+```
+
+
+
+Clean Intersections 
+
+dataframe must have 
+FID, names
+
+```{r Clean Intersection Key}
+cleanIntersection <- function(dataFrame){
+
+#all to lowercase 
+  
+dataFrame$names <- tolower(dataFrame$names)
+
+splitStreets <- separate(dataFrame,names,into = c("street1","street2"),sep = "&")
+
+#Street1 
+
+firstStreetSplit <- separate(splitStreets,"street1",into = c("x1","x2","x3","x4"), sep = " ")
+firstStreetSplit
+
+#Text to blank
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
+
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+firstStreetSplit[[cola]] <- ifelse(grepl(paste(textToBlank,collapse="|"), firstStreetSplit[[cola]]), "" , as.character(firstStreetSplit[[cola]]))
+}
+
+#NA to blank
+firstStreetSplit[is.na(firstStreetSplit)] <- ""
+
+#Other string additions
+
+text <- c("^boulevard$","^avenue$","^ave$","^road$","^place$","^court$","^drive$")
+replace <- c("blvd","av","av","rd","pl","ct","drive")
+
+for(k in 1:7){
+  
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+  for(i in 1:4){
+  cola <- paste('x', i, sep= '')
+  firstStreetSplit[[cola]] <- ifelse(grepl(tempText, firstStreetSplit[[cola]]), tempReplace , as.character(firstStreetSplit[[cola]]))
+  
+}
+}
+
+#firstStreetSplit
+
+#merge the street back together 
+
+firstStreetMerged <- firstStreetSplit %>% unite(street1, c("x1", "x2", "x3", "x4"), sep = "")
+
+#add an & 
+
+firstStreetMerged$street1 <- paste(firstStreetMerged$street1, "&", sep = "")
+
+#firstStreetMerged
+
+#Street2
+
+secondStreetSplit <- separate(firstStreetMerged,"street2",into = c("x1","x2","x3","x4"), sep = " ")
+
+#secondStreetSplit
+
+#Text to blank
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$")
+
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+secondStreetSplit[[cola]] <- ifelse(grepl(paste(textToBlank,collapse="|"), secondStreetSplit[[cola]]), "" , as.character(secondStreetSplit[[cola]]))
+}
+
+#NA to blank
+secondStreetSplit[is.na(secondStreetSplit)] <- ""
+
+#Other string additions
+
+text <- c("^boulevard$","^avenue$","^ave$","^road$","^place$","^court$","^drive$")
+replace <- c("blvd","av","av","rd","pl","ct","drive")
+
+for(k in 1:7){
+  
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+  for(i in 1:4){
+  cola <- paste('x', i, sep= '')
+  secondStreetSplit[[cola]] <- ifelse(grepl(tempText, secondStreetSplit[[cola]]), tempReplace , as.character(secondStreetSplit[[cola]]))
+  
+}
+}
+
+
+#Merge the second street back together 
+
+fullMerge <- secondStreetSplit %>% unite(col = street2, c("x1", "x2", "x3", "x4"), sep = "")
+
+#merge second street and first street 
+
+final <- fullMerge %>% unite(col = intersection, c("street1", "street2"), sep = "")
+
+return(final)
+}
+
+
+```
+
+
+Clean Search
+
+dataframe needs to have 
+Id, intersection (seperated by ' and ')
+
+```{r Clean Search Key}
+cleanSearch <- function(dataFrame){
+
+#all to lowercase 
+  
+dataFrame$intersection <- tolower(dataFrame$intersection)
+
+dataFrame <- dataFrame %>% filter(grepl(" and ", intersection))
+
+#Split into two streets by ' and '
+
+splitStreets <- separate(dataFrame, intersection, into = c("street1","street2"), sep = " and ")
+splitStreets
+
+
+#Repeat the same process for the two streets
+
+#Street1 
+
+#Split by each word
+
+firstStreetSplit <- separate(splitStreets,"street1",into = c("x1","x2","x3","x4"), sep = " ")
+firstStreetSplit
+
+#Text to blank
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$","^st.$")
+
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+firstStreetSplit[[cola]] <- ifelse(grepl(paste(textToBlank,collapse="|"), firstStreetSplit[[cola]]), "" , as.character(firstStreetSplit[[cola]]))
+}
+
+#NA to blank
+firstStreetSplit[is.na(firstStreetSplit)] <- ""
+
+#repalcement for 1900 
+
+
+ firstStreetSplit <- data.frame(lapply(firstStreetSplit, function(x) {
+                  gsub("2d", "2nd", x)
+             }))
+ firstStreetSplit <- data.frame(lapply(firstStreetSplit, function(x) {
+                  gsub("3d", "3rd", x)
+             }))
+
+
+
+#Text numbers to numbers 
+
+text <- c("^first$","^second$","^third$","^fourth$","^fifth$","^sixth","^seventh$","^eighth","^ninth","^tenth$","^eleventh$","^twelfth$","^thirteenth$","^fourteenth$","^fifteenth$","^sixteenth$","^seventeenth$","^eighteenth$","^nineteenth$","^twentieth$","^thirtieth$","^fortieth$","^fiftieth$","^sixtieth$","^seventieth$","^eightieth$","^ninetieth$")
+replace <- c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th","16th","17th","18th","19th","20th","30th","40th","50th","60th","70th","80th","90th")
+
+
+for(k in 1:27){
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+firstStreetSplit[[cola]] <- ifelse(grepl(tempText, firstStreetSplit[[cola]]), tempReplace , as.character(firstStreetSplit[[cola]]))
+
+}
+}
+
+text <- c("^twenty$","^thirty$","^forty$","^fifty$","^sixty$","^seventy","^eighty$","^ninety")
+replace <- c("2","3","4","5","6","7","8","9")
+
+for(k in 1:8){
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+firstStreetSplit[[cola]] <- ifelse(grepl(tempText, firstStreetSplit[[cola]]), tempReplace , as.character(firstStreetSplit[[cola]]))
+
+}
+}
+
+#Other string additions
+
+text <- c("^boulevard$","^avenue$","^ave$","^road$","^place$","^court$","^drive$")
+replace <- c("blvd","av","av","rd","pl","ct","drive")
+
+for(k in 1:7){
+  
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+  for(i in 1:4){
+  cola <- paste('x', i, sep= '')
+  firstStreetSplit[[cola]] <- ifelse(grepl(tempText, firstStreetSplit[[cola]]), tempReplace , as.character(firstStreetSplit[[cola]]))
+  
+}
+}
+
+#firstStreetSplit
+
+#merge the street back together 
+
+firstStreetMerged <- firstStreetSplit %>% unite(street1, c("x1", "x2", "x3", "x4"), sep = "")
+
+#add an & 
+
+firstStreetMerged$street1 <- paste(firstStreetMerged$street1, "&", sep = "")
+
+#firstStreetMerged
+
+firstStreetMerged
+
+
+
+
+
+#Street2
+
+secondStreetSplit <- separate(firstStreetMerged,"street2",into = c("x1","x2","x3","x4"), sep = " ")
+
+#secondStreetSplit
+
+#Text to blank
+textToBlank <- c("^e$","^w$","^n$","^s$","^st$","^street$","^west$","^south$","^north$","^east$","^e.$","^w.$","^n.$","^s.$","^sts$","^st.$")
+
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+secondStreetSplit[[cola]] <- ifelse(grepl(paste(textToBlank,collapse="|"), secondStreetSplit[[cola]]), "" , as.character(secondStreetSplit[[cola]]))
+}
+
+#NA to blank
+secondStreetSplit[is.na(secondStreetSplit)] <- ""
+
+
+#Ordinal Numbers 
+
+text <- c("^first$","^second$","^third$","^fourth$","^fifth$","^sixth","^seventh$","^eighth","^ninth","^tenth$","^eleventh$","^twelfth$","^thirteenth$","^fourteenth$","^fifteenth$","^sixteenth$","^seventeenth$","^eighteenth$","^nineteenth$","^twentieth$","^thirtieth$","^fortieth$","^fiftieth$","^sixtieth$","^seventieth$","^eightieth$","^ninetieth$")
+replace <- c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th","16th","17th","18th","19th","20th","30th","40th","50th","60th","70th","80th","90th")
+
+
+for(k in 1:27){
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+secondStreetSplit[[cola]] <- ifelse(grepl(tempText, secondStreetSplit[[cola]]), tempReplace , as.character(secondStreetSplit[[cola]]))
+
+}
+}
+
+text <- c("^twenty$","^thirty$","^forty$","^fifty$","^sixty$","^seventy","^eighty$","^ninety")
+replace <- c("2","3","4","5","6","7","8","9")
+
+for(k in 1:8){
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+for(i in 1:4){
+cola <- paste('x', i, sep= '')
+secondStreetSplit[[cola]] <- ifelse(grepl(tempText, secondStreetSplit[[cola]]), tempReplace , as.character(secondStreetSplit[[cola]]))
+
+}
+}
+
+
+
+#Other string additions
+
+text <- c("^boulevard$","^avenue$","^ave$","^road$","^place$","^court$","^drive$")
+replace <- c("blvd","av","av","rd","pl","ct","drive")
+
+for(k in 1:7){
+  
+  tempText <- text[k]
+  tempReplace <- replace[k]
+  
+  for(i in 1:4){
+  cola <- paste('x', i, sep= '')
+  secondStreetSplit[[cola]] <- ifelse(grepl(tempText, secondStreetSplit[[cola]]), tempReplace , as.character(secondStreetSplit[[cola]]))
+  
+}
+}
+
+#Merge the second street back together 
+
+fullMerge <- secondStreetSplit %>% unite(col = street2, c("x1", "x2", "x3", "x4"), sep = "")
+
+#merge second street and first street 
+
+final <- fullMerge %>% unite(col = First, c("street1", "street2"), sep = "") 
+
+final <- final %>% mutate(temp = First) %>% 
+  separate(temp, into = c("street1","street2"), sep = "&")
+
+final$street2 <- paste(final$street2, "&", sep = "")
+  
+final <- final %>% unite(col = Second, c("street2", "street1"), sep = "") 
+
+return(final)
+
+}
+
+```
+
+
+
+
+```{r}
+test <- read.csv("C:/Users/Billy/Desktop/Sewer Project Geocoding/CSVs/1880/1880_second_batch_.csv")
+test
+
+cleanSearch(test)
+```
+
+```{r}
+cleanIntersection(test)
+```
+

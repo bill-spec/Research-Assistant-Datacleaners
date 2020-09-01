@@ -54,10 +54,22 @@ nonCentral <- c("removethisvector")
 ```
 
 ```{r}
-data <- read.csv("C:/Users/the36/Desktop/DataRA/hiphop_insyle/hiphop_chicago.csv")
+data <- read.csv("C:/Users/Billy/Desktop/hipHop/hiphop_chicagoCSV.csv")
+names(data)
+
+data$Column <- as.factor(data$Column)
+
+data %>% 
+  mutate(
+    count = ifelse(Column != "", 1, 0)
+  ) %>% group_by(Year) %>% 
+  summarise(
+    count = n()
+  )
+
 
 data1 <- data %>% 
-  #dplyr::select(Year, Column, Area, Street) %>% 
+  dplyr::select(Year, Column, Area, Street) %>% 
   mutate(Column = tolower(Column)) %>% 
   mutate(Area = tolower(Area)) %>% 
   mutate(Street = tolower(Street)) %>% 
